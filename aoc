@@ -1,0 +1,28 @@
+# !/bin/bash
+
+makeDay () {
+	mkdir "Day$1" 
+	cp -r util/ Day$1/util
+
+	echo -en "module Day$1\n\ngo 1.21.1\n" > "Day$1/go.mod"
+	
+	echo -en "package main\n\nfunc main() {\n\n}\n" > "Day$1/main.go"
+}
+
+update () {
+	for d in */; do 
+		if [[ "$d" == Day* ]]; then
+			rm -rf $d/util
+			cp -r util/ $d/util
+		fi
+	done
+}
+
+if [ "$1" == "make" ]; then
+	makeDay $2
+elif [ "$1" == "update" ]; then 
+	update
+else
+	echo "Incorrect command"
+	echo "Possible commands are: aoc update and aoc make <day>"
+fi
