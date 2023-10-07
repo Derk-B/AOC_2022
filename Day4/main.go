@@ -11,7 +11,8 @@ func firstPart() {
 	lines := fileReader.ReadLines("input.txt")
 
 	
-	score := 0
+	score1 := 0
+	score2 := 0
 	for _, l := range lines {
 		parts := strings.Split(l, ",")
 		left := strings.Split(parts[0], "-")
@@ -23,11 +24,16 @@ func firstPart() {
 		rEnd, _ := strconv.Atoi(right[1])
 
 		if lStart >= rStart && lEnd <= rEnd || lStart <= rStart && lEnd >= rEnd {
-			score ++
+			score1++
+		}
+
+		if (lStart >= rStart && lStart <= rEnd) || (lEnd >= rStart && lEnd <= rEnd) || (rStart >= lStart && rStart <= lEnd) || (rEnd >= lStart && rEnd <= lEnd) {
+			score2++
 		}
 	}
 
-	fmt.Println(score)
+	fmt.Println(score1)
+	fmt.Println(score2)
 }
 
 func main() {
