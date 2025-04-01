@@ -18,10 +18,17 @@ update () {
 	done
 }
 
+run () {
+	cd "Day$1/"
+	go run .
+}
+
 if [ "$1" == "make" ]; then
 	makeDay $2
 elif [ "$1" == "update" ]; then 
 	update
+elif [ "$1" == "run" ]; then
+	run $2
 else
 	echo "Incorrect command"
 	echo "Possible commands are: aoc update and aoc make <day>"
