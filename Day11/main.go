@@ -17,6 +17,7 @@ type Monkey struct {
 }
 
 var bigMod = 1
+var part = 1
 
 func parseOperation(line string, old int) int {
 	strs := strings.Split(line, " ")
@@ -64,11 +65,11 @@ func parseMonkeys(lines []string) []Monkey {
 
 		// Parse items
 		for _, itemStr := range itemStrs {
-			item, err := strconv.Atoi(strings.Trim(itemStr, ","))
+			num, err := strconv.Atoi(strings.Trim(itemStr, ","))
+			item := num
 			if err != nil {
 				panic(err)
 			}
-			bigMod *= item
 			newMonkey.Items = append(newMonkey.Items, item)
 		}
 
@@ -82,6 +83,7 @@ func parseMonkeys(lines []string) []Monkey {
 			panic(err)
 		}
 		newMonkey.testDivisor = divisor
+		bigMod *= divisor
 
 		// Parse true and false targets
 		trueMonkeyStr := strings.Split(lines[mi*7+4], " ")[9]
@@ -100,28 +102,25 @@ func parseMonkeys(lines []string) []Monkey {
 
 		monkeys = append(monkeys, newMonkey)
 	}
+
 	return monkeys
 }
 
 func (m *Monkey) operate(monkeys *[]Monkey) {
 	for _, item := range m.Items {
-		// fmt.Println("Processing item", item)
 		m.businessCount++
 		newItemValue := parseOperation(m.operation, item)
-		newItemValue = newItemValue / 3
+		if part == 1 {
+			newItemValue = newItemValue / 3
+		} else {
+			newItemValue = newItemValue % bigMod
+		}
 
-		// itemCount := 0
-		// for _, m1 := range *monkeys {
-		// 	itemCount += len(m1.Items)
-		// }
-		// fmt.Println(itemCount)
-		// newItemValue = newItemValue % bigMod
 		if newItemValue%m.testDivisor == 0 {
 			(*monkeys)[m.monkeyWhenTrue].Items = append((*monkeys)[m.monkeyWhenTrue].Items, newItemValue)
 		} else {
 			(*monkeys)[m.monkeyWhenFalse].Items = append((*monkeys)[m.monkeyWhenFalse].Items, newItemValue)
 		}
-		// fmt.Println("Monkeys: ", monkeys)
 	}
 
 	m.Items = []int{}
@@ -130,7 +129,12 @@ func (m *Monkey) operate(monkeys *[]Monkey) {
 func main() {
 	lines := fileReader.ReadLines("input.txt")
 	monkeys := parseMonkeys(lines)
-	for i := 0; i < 20; i++ {
+	part = 2
+	rounds := 20
+	if part == 2 {
+		rounds = 10000
+	}
+	for i := 0; i < rounds; i++ {
 		for j := 0; j < len(monkeys); j++ {
 			monkey := &monkeys[j]
 			monkey.operate(&monkeys)
@@ -147,5 +151,5 @@ func main() {
 			max2 = monkey.businessCount
 		}
 	}
-	fmt.Println(max1 * max2)
+	fmt.Println("Part ", part, ": ", max1*max2)
 }
