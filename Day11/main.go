@@ -13,6 +13,7 @@ type Monkey struct {
 	testDivisor     int
 	monkeyWhenTrue  int
 	monkeyWhenFalse int
+	businessCount   int
 }
 
 var bigMod = 1
@@ -95,6 +96,7 @@ func parseMonkeys(lines []string) []Monkey {
 			panic(err)
 		}
 		newMonkey.monkeyWhenFalse = n
+		newMonkey.businessCount = 0
 
 		monkeys = append(monkeys, newMonkey)
 	}
@@ -104,34 +106,46 @@ func parseMonkeys(lines []string) []Monkey {
 func (m *Monkey) operate(monkeys *[]Monkey) {
 	for _, item := range m.Items {
 		// fmt.Println("Processing item", item)
+		m.businessCount++
 		newItemValue := parseOperation(m.operation, item)
 		newItemValue = newItemValue / 3
 
-		itemCount := 0
-		for _, m1 := range *monkeys {
-			itemCount += len(m1.Items)
-		}
-		fmt.Println(itemCount)
+		// itemCount := 0
+		// for _, m1 := range *monkeys {
+		// 	itemCount += len(m1.Items)
+		// }
+		// fmt.Println(itemCount)
 		// newItemValue = newItemValue % bigMod
 		if newItemValue%m.testDivisor == 0 {
 			(*monkeys)[m.monkeyWhenTrue].Items = append((*monkeys)[m.monkeyWhenTrue].Items, newItemValue)
 		} else {
 			(*monkeys)[m.monkeyWhenFalse].Items = append((*monkeys)[m.monkeyWhenFalse].Items, newItemValue)
 		}
+		// fmt.Println("Monkeys: ", monkeys)
 	}
+
+	m.Items = []int{}
 }
 
 func main() {
-	lines := fileReader.ReadLines("test.txt")
+	lines := fileReader.ReadLines("input.txt")
 	monkeys := parseMonkeys(lines)
 	for i := 0; i < 20; i++ {
-		// fmt.Println("Round: ", i)
-		for _, monkey := range monkeys {
-			// fmt.Println("Processing a monkey")
+		for j := 0; j < len(monkeys); j++ {
+			monkey := &monkeys[j]
 			monkey.operate(&monkeys)
-			monkey.Items = []int{}
 		}
 	}
 
-	fmt.Println(monkeys)
+	// Get 2 highest business counts
+	max1, max2 := 0, 0
+	for _, monkey := range monkeys {
+		if monkey.businessCount > max1 {
+			max2 = max1
+			max1 = monkey.businessCount
+		} else if monkey.businessCount > max2 {
+			max2 = monkey.businessCount
+		}
+	}
+	fmt.Println(max1 * max2)
 }
